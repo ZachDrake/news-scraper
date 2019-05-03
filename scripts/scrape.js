@@ -1,19 +1,28 @@
 var axios = require("axios");
 var cheerio = require("cheerio");
 
-axios.get("https://old.reddit.com/r/webdev/").then(function(response) {
-  var $ = cheerio.load(response.data);
+var scrape = function(callback) {
 
-  var results = [];
-
-  $("p.title").each(function(i, element) {
-
-    var title = $(element).text();
-
-    var link = $(element).children().attr("href");
-
-    results.push({
-      title: title,
-      link: link
+  axios.get("https://old.reddit.com/r/webdev/").then(function (response) {
+    var $ = cheerio.load(response.data);
+  
+    var articles = [];
+  
+    $("p.title").each(function (i, element) {
+  
+      var title = $(element).text().trim();
+  
+      var link = $(element).children().attr("href");
+  
+      var dataToAdd = {
+        title: title,
+        link: link
+      };
+  
+      articles.push(dataToAdd);
     });
+    callback(articles);
   });
+};
+
+module.exports = scrape;
